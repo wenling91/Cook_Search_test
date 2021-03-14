@@ -2,6 +2,7 @@ package com.cooking.merge.adapters
 
 import android.Manifest
 
+//以下為開啟相機所需要使用者授權的權限
 object Permissions {
     val PERMISSIONS = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.cooking.merge.adapters.Permissions
@@ -24,21 +25,29 @@ class MainActivity : AppCompatActivity() {
         val favoritesFragment = FavoritesFragment()
 
         setCurrentFragment(homeFragment)
-        if(checkPermissionArray(Permissions.PERMISSIONS)){
-            bottom_navigation.setOnNavigationItemSelectedListener {
-                when (it.itemId){
-                    R.id.nav_home -> setCurrentFragment(homeFragment)
-                    R.id.nav_search -> setCurrentFragment(searchFragment)
-                    R.id.nav_favorites -> setCurrentFragment(favoritesFragment)
+
+
+        bottom_navigation.setOnNavigationItemSelectedListener {
+            when (it.itemId){
+                R.id.nav_home -> setCurrentFragment(homeFragment)
+                R.id.nav_search -> {
+                    setCurrentFragment(searchFragment)
+
+                    //點選search時，和使用者要求權限
+                    if(checkPermissionArray(Permissions.PERMISSIONS)){
+                        Toast.makeText(applicationContext,"Camera Permissions Granted",Toast.LENGTH_LONG).show()
+                    }else{
+                        verifyPermissions(Permissions.PERMISSIONS)
+                    }
                 }
-                true
+                R.id.nav_favorites -> setCurrentFragment(favoritesFragment)
             }
-        }else{
-            verifyPermissions(Permissions.PERMISSIONS)
+            true
         }
 
     }
 
+    //系統跳出通知詢問使用者是否授權權限
     private fun verifyPermissions(permissions: Array<String>) {
         Log.d(ContentValues.TAG, "verifyPermissions : verifying permissions.")
         ActivityCompat.requestPermissions(
@@ -46,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    //用來查看權限是否已授權，已授權為true，反之為false
     private fun checkPermissionArray(permissions: Array<String>): Boolean {
         Log.d(ContentValues.TAG, "checkPermissionsArray: checking permissions array.")
         for (i in permissions.indices) {
@@ -57,9 +67,10 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //和使用者要求權限
     fun checkPermissions(permission: String): Boolean {
         Log.d(ContentValues.TAG, "checkPermissions: checking permissions $permission")
-        val permissionRequest = ActivityCompat.checkSelfPermission(this@MainActivity, permission)
+        val permissionRequest = ActivityCompat.checkSelfPermission(this, permission)
         return if (permissionRequest != PackageManager.PERMISSION_GRANTED) {
             Log.d(ContentValues.TAG, "checkPermissions: \n Permission wasn't granted for: $permission")
             false

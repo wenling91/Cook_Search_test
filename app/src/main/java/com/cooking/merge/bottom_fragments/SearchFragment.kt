@@ -25,20 +25,28 @@ class  SearchFragment : Fragment(){
     ): View{
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-        //Text Search
+        //Text Search 點擊事件
         val textSearch_btn = view.findViewById<View>(R.id.search_button) as Button
         textSearch_btn.setOnClickListener {
+
+            //使用Intent進入SearchActivity
             val intent = Intent(context, SearchActivity::class.java)
             startActivity(intent)
         }
 
-        //Open Camera
+        //Open Camera 點擊事件
         val Launch_Camera_btn = view.findViewById<View>(R.id.Launch_Camera_btn) as Button
         Launch_Camera_btn.setOnClickListener {
+
+            //若MainActivity中要求的相機權限已經授權
             if ((activity as MainActivity).checkPermissions(CAMERA_PERMISSIONS[0])) {
+
+                //進入Camera
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+
             } else {
+                //再次要求權限
                 val intent = Intent(activity, SearchActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -48,8 +56,12 @@ class  SearchFragment : Fragment(){
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        //若已經完成拍照並確認照片後
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val takenImage = data?.extras?.get("data") as Bitmap
+
+            //設定一變數作為照片的變數
+            //val takenImage = data?.extras?.get("data") as Bitmap
             //pictureView.setImageBitmap(takenImage)
         }
         else{
