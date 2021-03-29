@@ -8,12 +8,13 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.cooking.merge.MainActivity
 import com.cooking.merge.R
 import com.cooking.merge.SearchActivity
 import com.cooking.merge.adapters.Permissions.CAMERA_PERMISSIONS
+import kotlinx.android.synthetic.main.fragment_search.*
 
 
 class  SearchFragment : Fragment(){
@@ -24,15 +25,6 @@ class  SearchFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View{
         val view = inflater.inflate(R.layout.fragment_search, container, false)
-
-        //Text Search 點擊事件
-        val textSearch_btn = view.findViewById<View>(R.id.search_button) as Button
-        textSearch_btn.setOnClickListener {
-
-            //使用Intent進入SearchActivity
-            val intent = Intent(context, SearchActivity::class.java)
-            startActivity(intent)
-        }
 
         //Open Camera 點擊事件
         val Launch_Camera_btn = view.findViewById<View>(R.id.Launch_Camera_btn) as Button
@@ -52,6 +44,45 @@ class  SearchFragment : Fragment(){
                 startActivity(intent)
             }
         }
+
+        //熱門搜尋初始array
+        val searchItems = arrayOf("燕麥","優格","水果","草莓果醬","雞蛋",
+            "洋蔥","培根","即食大燕麥片","高湯塊","青蔥","肉片"
+        )
+
+        //設定一個新的adapter供熱門搜尋的List使用
+        val adapter : ArrayAdapter<String> = ArrayAdapter(
+            this, android.R.layout.simple_list_item_1,searchItems
+        )
+
+        searchList.adapter = adapter
+
+        //做一個textListener，參數query為輸入字串
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+
+            //當使用者輸入（提交）一text
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                searchView.clearFocus()         //轉移searchView的焦點，測試後可有可無
+
+                //若輸入字串與初始array中物件有匹配
+                if (searchItems.contains(query)){
+                    adapter.filter.filter(query)    //adapter過濾出輸入字串並只顯示對應的item
+                }
+
+                return false
+            }
+
+            //當使用者修改輸入字串
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                //重置adapter並重新檢查輸入字串
+                adapter.filter.filter(newText)
+                return false
+            }
+
+        })
+
         return view
     }
 
